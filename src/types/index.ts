@@ -3,6 +3,13 @@ export interface AuthResponse {
   userId: number;
   name: string;
   email: string;
+  roles: string[];
+}
+
+export interface Company {
+  id: number;
+  name: string;
+  code: string;
 }
 
 export interface BolRecord {
