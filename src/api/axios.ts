@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// All API calls go to Spring Boot backend
-// VITE_API_URL can be set at build time — defaults to localhost for local dev
+// In Docker: Nginx proxies /api/* to the Spring Boot backend (no hardcoded URL needed)
+// In local dev (npm run dev): Vite proxy in vite.config.ts forwards /api/* to localhost:8080
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
+  baseURL: '',
 });
 
 // Interceptor — runs before EVERY request
