@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Fillable PDF editor field styles ──────────────────────────────────── */
+.pdf-field {
+  border: none;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  transition: border-color 0.12s, background-color 0.12s;
+}
+.pdf-field:hover {
+  border-bottom-color: rgba(59, 130, 246, 0.35);
+}
+.pdf-field:focus {
+  border-bottom: 1.5px solid #3b82f6;
+  outline: none;
+}
+/* Remove number input spinners inside the PDF canvas */
+.pdf-field[type='number']::-webkit-outer-spin-button,
+.pdf-field[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.pdf-field[type='number'] {
+  -moz-appearance: textfield;
+}
+.pdf-check {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  font-weight: bold;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1;
+  user-select: none;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 1px;
+  transition: border-color 0.12s, background-color 0.12s;
+}
+.pdf-check:hover {
+  border-color: rgba(59, 130, 246, 0.45);
+  background: rgba(59, 130, 246, 0.06);
+}

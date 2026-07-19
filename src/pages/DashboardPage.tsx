@@ -4,19 +4,21 @@ import { useNavigate } from 'react-router-dom';
 import { generateBol, getBolHistory, voidBol, downloadPdf } from '../api/bols';
 import { getMyCompanies } from '../api/admin';
 import type { BolRecord, Company } from '../types';
+import type { BolFormData } from '../types/BolForm';
+import BolPdfEditor, { type Formatting } from '../components/BolPdfEditor';
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companies, setCompanies]               = useState<Company[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
-  const [bols, setBols] = useState<BolRecord[]>([]);
-  const [generating, setGenerating] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [bols, setBols]                         = useState<BolRecord[]>([]);
+  const [generating, setGenerating]             = useState(false);
+  const [showForm, setShowForm]                 = useState(false);
+  const [message, setMessage]                   = useState('');
+  const [error, setError]                       = useState('');
 
-  // On load: fetch user's companies, then load history for the first one
   useEffect(() => {
     getMyCompanies()
       .then((res) => {
@@ -40,14 +42,15 @@ export default function DashboardPage() {
     }
   };
 
-  const handleGenerate = async () => {
+  const handleFormSubmit = async (form: BolFormData, formatting: Formatting) => {
     if (!selectedCompanyId) return;
     setGenerating(true);
     setMessage('');
     setError('');
     try {
-      const res = await generateBol(selectedCompanyId);
+      const res = await generateBol(selectedCompanyId, form, formatting);
       setMessage(`Generated: ${res.data.bolNumber}`);
+      setShowForm(false);
       fetchHistory(selectedCompanyId);
     } catch {
       setError('Failed to generate BOL');
@@ -107,7 +110,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-8">
-        {/* Company selector (shown only if user belongs to multiple companies) */}
+        {/* Company selector */}
         {companies.length > 1 && (
           <div className="bg-white rounded-xl shadow-sm p-4 mb-4 flex items-center gap-3">
             <label className="text-sm font-medium text-gray-600">Company:</label>
@@ -125,14 +128,13 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* No company assigned yet */}
         {companies.length === 0 && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-5 py-4 rounded-xl mb-6 text-sm">
             You are not assigned to any company yet. Ask your admin to assign you.
           </div>
         )}
 
-        {/* Generate BOL section */}
+        {/* Generate section */}
         {selectedCompany && (
           <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-700 mb-4">
@@ -150,11 +152,10 @@ export default function DashboardPage() {
             )}
 
             <button
-              onClick={handleGenerate}
-              disabled={generating}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition disabled:opacity-50"
+              onClick={() => { setShowForm(true); setMessage(''); setError(''); }}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition"
             >
-              {generating ? 'Generating...' : 'Generate BOL'}
+              Fill &amp; Generate Shipping Tally
             </button>
           </div>
         )}
@@ -234,6 +235,15 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* BOL PDF Editor */}
+      {showForm && (
+        <BolPdfEditor
+          onSubmit={handleFormSubmit}
+          onCancel={() => setShowForm(false)}
+          submitting={generating}
+        />
+      )}
     </div>
   );
 }
