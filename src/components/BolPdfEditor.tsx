@@ -65,7 +65,7 @@ export default function BolPdfEditor({ onSubmit, onCancel, submitting }: Props) 
 
       const ctx = canvas.getContext('2d')!;
       ctx.scale(dpr, dpr);
-      await page.render({ canvasContext: ctx, viewport }).promise;
+      await page.render({ canvasContext: ctx, viewport, canvas }).promise;
 
       if (!cancelled) {
         setScale(s);
